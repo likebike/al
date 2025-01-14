@@ -418,13 +418,13 @@ impl Evaler for StdFunc {
             #[cfg(feature="unsafe-vars")]
             EUnsafeVar{ptr, ..} => unsafe { Ok(**ptr) },
 
-            EVar(name) => eval_var!(ns, name, Vec::new(), unsafe{ &mut *(&slab.ps.char_buf as *const _ as *mut _) }),
+            EVar(name) => eval_var!(ns, name, Vec::new(), unsafe{ &mut *slab.ps.char_buf.get() }),
             EFunc{name, args:xis} => {
                 let mut args = Vec::with_capacity(xis.len());
                 for xi in xis {
                     args.push(get_expr!(slab.ps,xi).eval(slab,ns)?)
                 }
-                eval_var!(ns, name, args, unsafe{ &mut *(&slab.ps.char_buf as *const _ as *mut _) })
+                eval_var!(ns, name, args, unsafe { &mut *slab.ps.char_buf.get() })
             }
 
             EFuncLog{base:base_opt, expr:expr_i} => {
@@ -584,13 +584,13 @@ impl Evaler for Instruction {
             INeg(i) => Ok(-eval_compiled_ref!(get_instr!(slab.cs,i), slab, ns)),
             IInv(i) => Ok(1.0/eval_compiled_ref!(get_instr!(slab.cs,i), slab, ns)),
 
-            IVar(name) => eval_var!(ns, name, Vec::new(), unsafe{ &mut *(&slab.ps.char_buf as *const _ as *mut _) }),
+            IVar(name) => eval_var!(ns, name, Vec::new(), unsafe { &mut *slab.ps.char_buf.get() }),
             IFunc{name, args:ics} => {
                 let mut args = Vec::with_capacity(ics.len());
                 for ic in ics {
                     args.push( eval_ic_ref!(ic, slab, ns) );
                 }
-                eval_var!(ns, name, args, unsafe{ &mut *(&slab.ps.char_buf as *const _ as *mut _) })
+                eval_var!(ns, name, args, unsafe { &mut *slab.ps.char_buf.get() })
             },
 
             IFuncLog{base:baseic, of:ofic} => {
@@ -701,4 +701,3 @@ impl Evaler for Instruction {
         }
     }
 }
-

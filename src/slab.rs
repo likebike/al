@@ -58,6 +58,7 @@ use crate::compiler::{Instruction::{self, IConst}, InstructionI};
 
 use std::fmt;
 use std::mem;
+use std::cell::UnsafeCell;
 
 #[cfg(feature="unsafe-vars")]
 use std::collections::BTreeMap;
@@ -215,7 +216,7 @@ pub struct ParseSlab {
     pub(crate) vals       :Vec<Value>,
     pub(crate) def_expr   :Expression,
     pub(crate) def_val    :Value,
-    pub(crate) char_buf   :String,
+    pub(crate) char_buf   :UnsafeCell<String>,
     #[cfg(feature="unsafe-vars")]
     pub(crate) unsafe_vars:BTreeMap<String, *const f64>,
 }
@@ -355,7 +356,7 @@ impl Slab {
                 vals       :Vec::with_capacity(cap),
                 def_expr   :Default::default(),
                 def_val    :Default::default(),
-                char_buf   :String::with_capacity(64),
+                char_buf   :UnsafeCell::new(String::with_capacity(64)),
                 #[cfg(feature="unsafe-vars")]
                 unsafe_vars:BTreeMap::new(),
             },
