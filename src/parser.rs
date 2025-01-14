@@ -396,11 +396,14 @@ impl Parser {
                         _ => (0,0),
                     };
                     if exp!=0 {
-                        slab.char_buf.clear();
-                        slab.char_buf.push_str(tok);
-                        slab.char_buf.push('e');
-                        slab.char_buf.push_str(&exp.to_string());
-                        tok = &slab.char_buf;
+                        unsafe {
+                            let char_buf = &mut *slab.char_buf.get();
+                            char_buf.clear();
+                            char_buf.push_str(tok);
+                            char_buf.push('e');
+                            char_buf.push_str(&exp.to_string());
+                            tok = char_buf;
+                        }
 
                         toklen = toklen+suffixlen;
                     }
